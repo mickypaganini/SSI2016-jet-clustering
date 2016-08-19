@@ -1,0 +1,169 @@
+// Copyright (c) 2010-11, Pierre-Antoine Delsart, Kurtis Geerlings, Joey Huston,
+//                 Brian Martin, and Christopher Vermilion
+//
+//----------------------------------------------------------------------
+// This file is part of SpartyJet.
+//
+//  SpartyJet is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  SpartyJet is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with SpartyJet; if not, write to the Free Software
+//  Foundation, Inc.:
+//      59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//----------------------------------------------------------------------
+
+// emacs this is -*- c++ -*-
+
+#include <cassert>
+
+namespace SpartyJet { 
+
+// GenericJetVar functions now in OutputVarUtils.cc, since they are not templated.
+
+// *****************************************************
+template<class BRANCH1D>
+void JetVar<BRANCH1D>::set_var_names(std::string neta, std::string nphi, std::string npt,
+                                     std::string ne,std::string nmass, std::string /*nind*/,
+                                     std::string /* numc*/)
+{
+  var_names.eta = neta;
+  var_names.phi = nphi;
+  var_names.pt = npt;
+  var_names.e   = ne;
+  var_names.mass = nmass;
+}
+
+// *****************************************************
+template<class BRANCH1D>
+void JetVar<BRANCH1D>::schedule(TTree* tree)
+{
+
+  GenericJetVar::schedule(tree);
+
+  this->m_Nmax = eta.size_max();
+
+  BranchWrap_simple<int>& N = this->N;
+
+  eta.set_refN(&N);
+  phi.set_refN(&N);
+  e.set_refN(&N);
+  mass.set_refN(&N);
+  pt.set_refN(&N);
+
+  this->set_name_register(eta, var_names.eta, tree);
+  this->set_name_register(phi, var_names.phi, tree);
+  this->set_name_register(e, var_names.e, tree);
+  this->set_name_register(mass, var_names.mass, tree);
+  this->set_name_register(pt, var_names.pt, tree);
+}
+
+// *****************************************************
+template<class BRANCH1D>
+void JetVar<BRANCH1D>::set_data(JetCollection& theJets)
+{
+  GenericJetVar::set_data(theJets);
+
+  JetCollection::iterator jit  = theJets.begin();
+  JetCollection::iterator jitE = theJets.end();
+  size_t count = 0;
+  size_t max = m_Nmax;
+
+  for (; jit != jitE; ++jit) {
+    Jet *j = (*jit);
+    eta[count] = j->eta();
+    if (IGenericJetVar::do_phiconversion) phi[count] = to_zero_2PI(j->phi());
+    else phi[count] = j->phi();
+    e[count]    = j->e();
+    pt[count]   = j->pt();
+    mass[count] = j->mass();
+    count++;
+    if(count == max) break;
+  }
+  N = count;
+}
+
+template<class BRANCH1D>
+void JetVar<BRANCH1D>::resize_vars(JetCollection& theJets)
+{
+  GenericJetVar::resize_vars(theJets);
+  size_t Njet = N;
+  eta.resize(Njet);
+  phi.resize(Njet);
+  e.resize(Njet);
+  mass.resize(Njet);
+  pt.resize(Njet);
+}
+
+
+template<class BRANCH1D, class BRANCH1Dind>
+JetVarIndex<BRANCH1D, BRANCH1Dind>::JetVarIndex(std::string name, JetMomentMap* mmap): JetVar<BRANCH1D>(name, mmap)
+{
+  m_input_refN = 0;
+  m_input_sizeMax = index.size_max();
+}
+
+template<class BRANCH1D, class BRANCH1Dind>
+void JetVarIndex<BRANCH1D, BRANCH1Dind>::schedule(TTree* tree)
+{
+  JetVar<BRANCH1D>::schedule(tree); // define JetVar variables
+
+  // register the array of index :
+  if (!m_input_refN) {
+    this->m_log << " !!! ERROR  !!! JetVarIndex : input_var not set. " << this->m_prefix << std::endl;
+    return;
+  }
+  index.set_refN(m_input_refN);
+  this->set_name_register(index, this->var_names.ind, tree);
+
+  num_constit.set_refN(&(this->N));
+  this->set_name_register(num_constit, this->var_names.numC, tree);
+}
+
+template<class BRANCH1D, class BRANCH1Dind>
+void JetVarIndex<BRANCH1D, BRANCH1Dind>::set_data(JetCollection& theJets)
+{
+
+  // Set the normal jet variables from input JetCollection
+  JetVar<BRANCH1D>::set_data(theJets);
+
+  JetCollection::iterator jit  = theJets.begin();
+  JetCollection::iterator jitE = theJets.end();
+  size_t Nconst = (size_t) (*m_input_refN);
+  Nconst = Nconst > m_input_sizeMax ? m_input_sizeMax : Nconst;
+
+  // initialize index :
+  for (size_t i = 0; i < Nconst; i++) index[i] = -1;
+  size_t jet = 0;
+
+  // Loop on all jets :
+  for (; jit != jitE; ++jit) {
+    num_constit[jet] = (*jit)->get_constituent_num();
+    Jet::constit_vect_t::iterator cit  = (*jit)->first_constituent();
+    Jet::constit_vect_t::iterator citE = (*jit)->last_constituent();
+    // loop on all constituents : 
+    for (; cit != citE; ++cit) {
+      assert((*cit)->input_index() < Nconst);
+      index[(*cit)->input_index()] = jet; // DANGEROUS !!! assume index is always big enough
+    }
+    jet++;
+    if (jet == this->m_Nmax) break; 
+  }
+}
+
+template< class BRANCH1D, class BRANCH1Dind>
+void JetVarIndex<BRANCH1D, BRANCH1Dind >::resize_vars(JetCollection& theJets)
+{
+  JetVar<BRANCH1D>::resize_vars(theJets);
+  num_constit.resize(this->N);
+  index.resize((int)(*m_input_refN));
+}
+
+} // namespace SpartyJet

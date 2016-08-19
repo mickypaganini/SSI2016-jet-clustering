@@ -1,0 +1,17 @@
+This directory contains the pxcone code (written by Luis Del Pozo and
+Michael H. Seymour) together with a plugin (written by M. Cacciari and
+G. Salam) for using it within fastjet.
+
+While permission has been granted for pxcone to be distributed with
+fastjet, this is under the condition that it be made clear that pxcone
+is _not_ a supported produce.
+
+Compiling
+---------
+Just type "make"
+
+Using it
+--------
+See the example program in ../../examples/plugins/
+
+

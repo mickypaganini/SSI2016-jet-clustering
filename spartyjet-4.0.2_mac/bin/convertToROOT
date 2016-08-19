@@ -1,0 +1,62 @@
+#!/usr/bin/env python
+# $Id: convertToROOT 545 2012-01-18 06:10:03Z cvermilion $
+#----------------------------------------------------------------------
+# Copyright (c) 2010-12, Pierre-Antoine Delsart, Kurtis Geerlings, Joey Huston,
+#                 Brian Martin, and Christopher Vermilion
+#
+#----------------------------------------------------------------------
+# This file is part of SpartyJet.
+#
+#  SpartyJet is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  SpartyJet is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with SpartyJet; if not, write to the Free Software
+#  Foundation, Inc.:
+#      59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#----------------------------------------------------------------------
+
+# This script uses the various input facilities of SpartyJet as a means to
+# convert any allowable input file type into a ROOT file with branches:
+#
+# Input_px
+# Input_py
+# Input_pz
+# Input_E
+# Input_pdgId
+# Input_N
+#
+# _N is an int, the rest are arrays of length N.
+#
+# The resulting ROOT file is suitable for SpartyJet input via 
+#  input = getInputMaker('foo.root')
+# This is somewhat to much faster than reading ASCII input.
+
+from spartyjet import *
+from sys import argv
+#===============================================
+
+infile = argv[1]
+outfile = argv[2]
+
+# --------------------- Setup/Input ----------------------------------
+
+# Create a jet builder
+builder = SJ.JetBuilder(SJ.ERROR)
+# Configure input
+builder.configure_input(getInputMaker(infile))
+
+# Configure output--------------------------------
+builder.configure_output("InputParticles", outfile)
+
+# Run SpartyJet
+builder.print_event_every(100)
+builder.process_events()
+

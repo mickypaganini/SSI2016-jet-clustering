@@ -1,0 +1,23 @@
+***********************************************************
+*                                                         *
+*             Multivariate W-Tagging                      *
+*                                                         *
+*  Written by Yanou Cui, Zhenyu Han and Matthew Schwartz  *
+*                                                         * 
+***********************************************************
+
+The essential code is "include/wtag.h", where functions are defined for calculating the variables and tagging W-jets. The usage is described at the top of "src/wtag.cc". The code requires the following programs as prerequisites.  
+
+ROOT
+TMVA
+Fastjet
+Fastprune
+
+Two examples are given in the directory "examples/": "test_wtag" does the wtagging using the  grooming parameters and BDT weight files included in the directory "data/"; "print_mvars" outputs the variables to datafiles, which is useful if one would like to examine and train the data using different parameters. To run the examples, Pythia 8 needs to be installed in addition to the above programs. To compile and run the examples, one needs to modify the "Makefile" to direct the compiler to the correct PATHs for the prerequisite programs. Then do
+
+make 
+./test_wtag
+./print_mvars
+
+Both examples take W-jets from WW->lvqq samples and background QCD-jets from Wj->lvj samples. If running succesfully, the first example prints out signal and background tagging efficiencies. The second example outputs the variables to files, "mvars_ww.dat" and "mvars_wj.dat", for signal and background jets respectively.
+   

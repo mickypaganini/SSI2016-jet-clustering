@@ -1,0 +1,12 @@
+This directory consists of external packages that a) SpartyJet depends on
+(FastJet, StdHEP) and/or b) have non-trivial organization (W-tagging).
+
+The "W-tagging" package was written by Cui, Han, and Schwartz, and is
+available at http://jets.harvard.edu/wtag.  It is all contained in the file
+
+wjet-1.00.tar.gz
+
+The version included here has a small edit (src/wtag.cc:1320) to fix what
+seems to be use of a deprecated TMVA function.  Also, the examples have been
+removed to save space.
+

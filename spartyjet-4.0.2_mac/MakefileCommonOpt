@@ -1,0 +1,52 @@
+# emacs, this is a -*- Makefile -*-
+#--------------------------------------------------------------------
+
+# Set Platform type: LINUX or MAC_OSX
+PLATFORM_TYPE := $(shell uname -s)
+
+ifeq ($(PLATFORM_TYPE), Linux)
+	DO_FPIC := -fpic
+	SOFLAGS := -shared
+	SHARED_LIBRARY_SUFFIX := so
+else
+	ifeq ($(PLATFORM_TYPE), Darwin)
+		DO_FPIC := -fPIC
+		SOFLAGS := -dynamiclib -undefined dynamic_lookup
+		SHARED_LIBRARY_SUFFIX := dylib
+	endif
+endif
+
+CXX           = g++ 
+CXXFLAGS      =  -Wall -g -O0 $(DO_FPIC) -fno-strict-aliasing # in some cases, no flags produce faster code than -O ones !! 
+LD            = g++
+LDFLAGS       = -O0 $(DO_FPIC)
+cppExtension := .cc         # File extension of source files
+CPPFLAGS +=                 # List flags to pass to C/C++ preprocessor
+OutPutOpt     = -o # keep whitespace after "-o"
+
+ROOTCFLAGS   := $(shell root-config --cflags)
+ROOTLDFLAGS  := $(shell root-config --ldflags)
+ROOTLIBS     := $(shell root-config --libs)
+ROOTGLIBS    := $(shell root-config --glibs)
+ROOTAUXLIBS  := $(shell root-config --auxlibs)
+HASTHREAD    := $(shell root-config --has-thread)
+
+LDFLAGS += $(ROOTLDFLAGS)
+INCLUDE := $(ROOTCFLAGS) -I$(SPARTYJETDIR)
+
+# FastJet setup
+ifeq (,$(shell which fastjet-config))
+	FASTJETDIR ?= $(SPARTYJETDIR)/External/fastjet-install
+	# To upgrade Fastjet edit the following line (careful not to include whitespace after version)
+	version := 3.0.0
+else
+	FASTJETDIR := $(shell fastjet-config --prefix)
+	version := $(shell fastjet-config --version)
+endif
+
+INCLUDE += -I$(FASTJETDIR)/include
+
+# Do STDHEP or not
+ifneq (,$(shell which $(F77)))
+DO_STDHEP=True
+endif

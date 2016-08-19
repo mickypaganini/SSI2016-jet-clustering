@@ -1,0 +1,49 @@
+This directory consists of a number of external jet tools, together with a few
+simple SpartyJet wrappers.  The following files are internal to SpartyJet and
+were written by the SpartyJet authors:
+
+ExternalToolsLinkDef.hpp
+TransformerTool.hh,cc (wraps FastJet Transformers)
+TransformerMonentHandler.hh,cc (provide helper functions to store jet moments)
+TopTaggerDipolarityTool.hh,cc
+AngularCorrelationTool.hh
+Makefile
+README (see README for further details)
+
+
+The following taggers and variables are independent of SpartyJet and were
+written by Christopher K. Vermilion.  CMSTopTagger.hh and HEPTopTaggerWraperr.hh
+are based on the JHTopTagger code, written by the FastJet authors.  HEPTopTaggerWrapper
+wraps HEPTopTagger.hh (see below); WTagger wraps the "wtag" code in External/.
+
+CMSTopTagger.hh
+HEPTopTaggerWrapper.hh,cc
+BoostVariables.hh
+WTagger.hh
+
+HEPTopTagger.hh is courtesy Tilman Plehn, available at http://fastjet.fr/tools.
+We have made a very small modification, suggested by Gavin Salam, so that the
+ClusterSequence used in filtering stays alive and can be used to access the
+top jet's substructure.
+
+
+The following files constitute Peter Loch's calorimeter simulation, available
+from his website (http://atlas.physics.arizona.edu/~loch/index.html).  Some
+minor, transparent changes have been made for speed.
+
+DetectorModel.h
+DetectorModel.cxx
+
+
+The following code is courtesy Martin Jankowiak:
+
+Dipolarity.hh
+AngularCorrelation.{hh,cc}
+
+
+The Njettiness package in Njettiness/ was written by Jesse Thaler, Ken Van
+Tilburg, and Christopher K. Vermilion.
+
+The Qjets package in Qjets/ is taken from jets.physics.harvard.edu/Qjets and
+implements the Qjets technique described in arXiv:1201.1914, by Stephen D.
+Ellis, Andrew Hornig, David Krohn, Tuhin S. Roy, and Matthew D. Schwartz.

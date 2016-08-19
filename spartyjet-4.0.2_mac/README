@@ -1,0 +1,111 @@
+************
+SOME ENVIRONMENT VARIABLES NEED TO BE SET FIRST (if you don't already do this)!
+
+e.g. for me:
+export ROOTSYS=/Users/hrussell/Applications/root
+export PYTHONPATH=/Users/hrussell/Applications/root/lib:$PYTHONPATH
+export DYLD_LIBRARY_PATH=/Users/hrussell/Applications/root/lib
+
+then do:
+source setup.sh
+cd fastjet-3.0.0
+./configure
+make
+make install
+cd ../
+make
+*************
+
+***********************************************************************
+***********************************************************************
+***** SpartyJet v 4.0.2                                           *****
+*****    A framework for jet analysis and visualization           *****
+*****    last updated: 2/8/2012                                   *****
+***********************************************************************
+***********************************************************************
+
+***********************************************************************
+LICENSE:
+***********************************************************************	
+This Software is under GNU General Public License v3.
+
+
+***********************************************************************
+AUTHORS:
+***********************************************************************	
+Original software from:
+Pierre-Antoine Delsart    Université de Montréal / IN2P3, LPSC Grenoble
+Kurtis L. Geerlings       Michigan State University
+Joey Huston               Michigan State University
+Brian T. Martin           Michigan State University
+Christopher K. Vermilion  Univ. of Louisville / Lawrence Berkeley Lab
+
+------------------------------------
+Third party software :
+------------------------------------
+See COPYING.
+------------------------------------
+
+
+***********************************************************************
+INSTALLATION:
+***********************************************************************	
+
+SpartyJet requires ROOT (it has been tested with several recent versions,
+primarily 5.30 and 5.32) and FastJet 3.0.  You must have your own installation
+of ROOT, but if you do not have FastJet you can use an internal build in
+SpartyJet.
+
+-  Just type:
+     source setup.sh
+     make fastjet (if not using your own FastJet)
+     make 
+
+-  Or, try the experimental CMake build system.  In a separate
+   directory, say spartyjet/build, do:
+     cmake ..
+     make fastjet (if not using your own FastJet)
+     cmake ..     (if not using your own FastJet)
+     make
+     cd ..; source setup.sh (to put FJ in your [DY]LD_LIBRARY_PATH)
+
+   You can configure options via the ccmake tool:
+     ccmake ..
+     make
+
+   You can also build a project for various IDE's, e.g. Xcode:
+     cmake .. -G Xcode
+
+   Let us know if you try this build system and it works (or doesn't)!
+
+***********************************************************************
+RUNNING:
+***********************************************************************	
+SpartyJet can be run from a Python script or compiled C++ program.
+Via a Python script is the recommended way of running.
+
+########### SpartyJet Examples ###########
+
+==== Python examples ====
+>  source setup.sh
+>  cd examples_py
+>  ./simpleExample.py
+=========================
+
+===== C++ examples ======
+> source setup.sh
+>  cd examples_C
+>  make
+>  ./FJExample.exe
+=========================
+
+Input:
+All input can be found in: data
+
+Output:
+By default output is saved to: data/output
+
+Full documentation can be found at: 
+http://projects.hepforge.org/spartyjet
+or in spartyjet/doc/
+
