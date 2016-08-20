@@ -5,6 +5,10 @@ from sklearn import metrics
 from sklearn.datasets.samples_generator import make_blobs
 import numpy as np
 from read_data import read_data
+from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
+from itertools import cycle
 
 def af(readin, event=2):
 	##############################################################################
@@ -12,18 +16,22 @@ def af(readin, event=2):
 	if readin:
 		X_all, e_all = read_data()
 		X = X_all[event]
+		e = e_all[event]
+		# Scale e to 0 mean, 1 sd to use as 'preference' in AffinityPropagation (IR)
+		scaler = StandardScaler()
+		preference = scaler.fit_transform(e) - 3 # -3 just seems to work well 
+
 	else:
 		centers = [[1, 1], [-1, -1], [1, -1]]
 		X, labels_true = make_blobs(n_samples=300, centers=centers, cluster_std=0.5,
 															random_state=0)
+		preference = -50
 
 	##############################################################################
 	# Compute Affinity Propagation
-	af = AffinityPropagation(preference=-1).fit(X) #preference=-50
+	af = AffinityPropagation(preference=preference).fit(X) #preference=-1
 	cluster_centers_indices = af.cluster_centers_indices_
-	#print af.cluster_centers_
 	labels = af.labels_
-
 	n_clusters_ = len(cluster_centers_indices)
 
 	print('Estimated number of clusters: %d' % n_clusters_)
@@ -40,22 +48,25 @@ def af(readin, event=2):
 
 	##############################################################################
 	# Plot result
-	import matplotlib.pyplot as plt
-	from itertools import cycle
-
-	plt.close('all')
-	plt.figure(1)
-	plt.clf()
-
-	colors = cycle('bgrcmykbgrcmykbgrcmykbgrcmyk')
-	for k, col in zip(range(n_clusters_), colors):
+	# -- display event
+	binx = np.linspace(-3.0, 3.0, 61)
+	biny = np.linspace(-3.1, 3.1, 63)
+	if readin:
+		plt.hist2d(X[:, 0], X[:, 1], weights=e.ravel(), bins=(binx, biny), cmap='BuPu', norm=LogNorm())
+		cb = plt.colorbar()
+		cb.set_label('Energy (GeV)')
+	plt.xlabel(r'$\eta$')
+	plt.ylabel(r'$\phi$')
+	# -- display clustering features
+	for k in range(n_clusters_):
 		class_members = labels == k
 		cluster_center = X[cluster_centers_indices[k]]
-		plt.plot(X[class_members, 0], X[class_members, 1], col + '.')
-		plt.plot(cluster_center[0], cluster_center[1], 'o', markerfacecolor=col,
-						 markeredgecolor='k', markersize=14)
+		if not readin:
+			plt.plot(X[class_members, 0], X[class_members, 1], 'k.', alpha=0.2)
+		plt.plot(cluster_center[0], cluster_center[1], 'ko', markerfacecolor='None', #markeredgecolor='k', 
+						 markersize=14)
 		for x in X[class_members]:
-			plt.plot([cluster_center[0], x[0]], [cluster_center[1], x[1]], col)
+			plt.plot([cluster_center[0], x[0]], [cluster_center[1], x[1]], color='black',alpha=0.2)
 
 	plt.title('Estimated number of clusters: %d' % n_clusters_)
 	plt.show()
@@ -64,14 +75,14 @@ if __name__ == '__main__':
 	import sys
 	import argparse
 
-	# -- read in arguments
+	# Read in arguments
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--readin', help="pass this flag to read in blobs from txt file; else make_blobs", action='store_true')
 	parser.add_argument('--event', help="int, number of the event to consider", type=int)
 	
 	args = parser.parse_args()
 
-	# -- pass arguments to main
+	# Pass arguments to main
 	if args.event is not None:
 		sys.exit(af(args.readin, args.event))
 	else:
