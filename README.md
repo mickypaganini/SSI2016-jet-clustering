@@ -10,5 +10,7 @@ For example, to run <i>AffinityPropagation</i>, you can run one of the following
 * `python af.py --readin --event 5` reads in data from the JetGenerator and allows you to specify the event (in this case 5)
 
 To-do:
-1) Nicely split up data reading, clustering, and plotting
-2) Check IRC safe
+
+1. Nicely split up data reading, clustering, and plotting
+
+2. Check IRC safe
