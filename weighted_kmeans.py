@@ -79,6 +79,11 @@ def km(readin, event=2, n_clusters_=2, inputFile = 'JetGenerator/clu10_2jets_wit
       for k in range(0,n_clusters_):
         class0=Z==orders[k]
         plt.hist2d(X[class0, 0], X[class0, 1], weights=xWeights[class0].ravel(), bins=(binx, biny), vmin=1,cmap=my_cmaps[k], norm=LogNorm())
+        jetEnergy = 0
+        for weight in xWeights[class0]:
+            jetEnergy += weight
+        print('pT: ', jetEnergy, ', eta: ', k_means_cluster_centers[orders[k],0],' phi: ', k_means_cluster_centers[orders[k],1])
+
         if k == 0:
             cba = plt.colorbar(extend='min')
             cba.set_label('Energy (GeV)')
@@ -94,8 +99,7 @@ def km(readin, event=2, n_clusters_=2, inputFile = 'JetGenerator/clu10_2jets_wit
     # -- display clustering features
     for k in range(0,n_clusters_):
         plt.plot(k_means_cluster_centers[orders[k],0], k_means_cluster_centers[orders[k],1], 'ko', markerfacecolor='None', markersize=10)
-        print('eta: ', k_means_cluster_centers[orders[k],0],' phi: ', k_means_cluster_centers[orders[k],1])
-    plt.title('Weighted k-means: 6 clusters, no noise')
+    plt.title('Weighted k-means: 10 clustersne')
     plt.show()
 
 

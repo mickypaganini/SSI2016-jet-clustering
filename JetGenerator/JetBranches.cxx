@@ -11,6 +11,7 @@
 #include "Riostream.h"
 #include <iostream>
 #include "TMath.h"
+#include "TLorentzVector.h"
 
 void JetBranches::initializeVectors(TTree* &t){
     c_energy = 0;
@@ -56,13 +57,18 @@ void JetBranches::clearAllVectors(){
     maxEnergyJIndex = 0;
 }
 
-void JetBranches::generateJets(TRandom3 *rand, int nCells){
+void JetBranches::generateJets(TRandom3 *rand, int nCells, bool makeJetsCloseby){
     std::vector<double> cell_eta;
     std::vector<double> cell_phi;
     std::vector<double> cell_energy;
-    double jetEta = double(rand->Integer(61))*0.1 - 3.0;
-    double jetPhi = double(rand->Integer(63))*0.1 - 3.1;
-
+    double jetEta = double(rand->Integer(53) + 4)*0.1 - 3.0;
+    double jetPhi = double(rand->Integer(55) + 4)*0.1 - 3.1;
+    if(makeJetsCloseby){
+        if(j_eta->size() > 0){
+            jetEta = j_eta->at(j_eta->size() - 1) + 0.4;
+            jetPhi = j_phi->at(j_eta->size() - 1) + 0.4;
+        }
+    }
     double jetEta_Centre = 0;
     double jetCosPhi_Centre = 0;
     double jetSinPhi_Centre = 0;
@@ -70,20 +76,23 @@ void JetBranches::generateJets(TRandom3 *rand, int nCells){
     double tmpEnergy = 0;
 
     for(unsigned int i_cell = 0; i_cell < nCells; i_cell++){
-        double eta = rand->Gaus(jetEta,0.2);
+        double eta = rand->Gaus(jetEta,0.1);
         eta = double(TMath::Nint(eta*10.))*0.1;
-        double phi = rand->Gaus(jetPhi,0.2);
+        double phi = rand->Gaus(jetPhi,0.1);
         phi = double(TMath::Nint(phi*10.))*0.1;
         
-        double energy = TMath::Abs(rand->Gaus(100,20));
+        double energy = -1;
+        if(i_cell < 2) energy = TMath::Abs(rand->Gaus(100,20));
+        else energy = TMath::Abs(rand->Gaus(40,20));
+        
         if(energy == 0) energy = 0.001;
         int cellTmp = int((eta + 3.0)*10.)*int((phi + 3.1)*10.);
 
         while(std::find(cell_filled.begin(), cell_filled.end(), cellTmp) != cell_filled.end()){
             if(rand->Integer(2) == 1){
-                eta = double(TMath::Nint(rand->Gaus(jetEta,0.1)*10.))*0.1;
+                eta = double(TMath::Nint(rand->Gaus(jetEta,0.2)*10.))*0.1;
             } else {
-                phi = double(TMath::Nint(rand->Gaus(jetPhi,0.1)*10.))*0.1;
+                phi = double(TMath::Nint(rand->Gaus(jetPhi,0.2)*10.))*0.1;
             }
             cellTmp = int((eta + 3.0)*10.)*int((phi + 3.1)*10.);
         }
@@ -132,11 +141,48 @@ void JetBranches::splitHighestECell(JetBranches * &jetsCL){
     jetsCL->c_phi->at(maxEnergyJIndex).push_back(c_phi->at(maxEnergyJIndex).at(maxEnergyCIndex) - 0.05);
 
 }
-void JetBranches::addIRNoise(TRandom3 *rand, JetBranches * &jetsIR){
-    for(unsigned int i_jet=0; i_jet < j_eta->size(); i_jet++){
-        //j_eta->at(i_jet)
-        //c_energy->at(i_jet)->push_back();
-        std::cout << "not implemented yet" << std::endl;
+void JetBranches::addIRNoise(int evt, TRandom3 *rand, JetBranches * &jetsIR, std::ofstream &txtFileIR, std::ofstream &datFileIR){
+
+    *jetsIR->j_eta = (*j_eta);
+    *jetsIR->j_phi = (*j_phi);
+    *jetsIR->j_energy = (*j_energy);
+    
+    *jetsIR->c_energy = (*c_energy);
+    *jetsIR->c_eta = (*c_eta);
+    *jetsIR->c_phi = (*c_phi);
+    
+    std::vector<double> cell_eta;
+    std::vector<double> cell_phi;
+    std::vector<double> cell_energy;
+    
+    for(unsigned int i=0; i < 1000; i++){
+        
+        double noiseEta = double(rand->Integer(61))*0.1 - 3.0;
+        double noisePhi = double(rand->Integer(63))*0.1 - 3.1;
+        double noiseEnergy = 0.00000001;
+        int cellTmp = int((noiseEta + 3.0)*10.)*int((noisePhi+ 3.1)*10.);
+        if(std::find(cell_filled.begin(), cell_filled.end(), cellTmp) != cell_filled.end()){
+            continue;
+        }
+        TLorentzVector cell;
+        cell.SetPtEtaPhiM(noiseEnergy,noiseEta,noisePhi,0.0);
+        
+        cell_eta.push_back(noiseEta);
+        cell_phi.push_back(noisePhi);
+        cell_energy.push_back(noiseEnergy);
+        txtFileIR << evt << " " << noiseEta;
+        txtFileIR << " " << noisePhi;
+        txtFileIR << " " << noiseEnergy << "\n";
+        
+        datFileIR << cell.E() << " " << cell.Px() << " " << cell.Py() << " " << cell.Pz() << "\n";
+        
     }
+    jetsIR->j_eta->push_back(-99.);
+    jetsIR->j_phi->push_back(-99.);
+    jetsIR->j_energy->push_back(0.);
+
+    jetsIR->c_eta->push_back(cell_eta);
+    jetsIR->c_phi->push_back(cell_phi);
+    jetsIR->c_energy->push_back(cell_energy);
     
 }
