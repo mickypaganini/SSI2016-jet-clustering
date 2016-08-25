@@ -1,0 +1,31 @@
+"""
+    Some helper functions for visualizing events.
+"""
+from read_data import read_data
+import numpy as np
+import math
+import matplotlib.pyplot as plt
+
+def get_events():
+    v, e = read_data()
+    events = [np.concatenate((v[i], e[i]), 1) for i in xrange(len(e))]
+    return events
+
+def render_particles(event):
+    plt.title("Particle Positions")
+    x, y, e = zip(*event)
+    plt.scatter(x, y, c=e, vmin=10, vmax=200, cmap="gist_rainbow") 
+    plt.colorbar()
+
+def show_particles(event):
+    plt.figure()
+    render_particles(event)
+    plt.show()
+
+def show_events(events):
+    for i, e in enumerate(events):
+        plt.subplot(2, int(math.ceil(len(events)/2.)), i+1)
+        render_particles(e)
+        plt.title("Event %d" % i)
+
+    plt.show()
