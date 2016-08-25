@@ -86,7 +86,7 @@ void JetBranches::generateJets(TRandom3 *rand, int nCells, bool makeJetsCloseby)
         else energy = TMath::Abs(rand->Gaus(40,20));
         
         if(energy == 0) energy = 0.001;
-        int cellTmp = int((eta + 3.0)*10.)*int((phi + 3.1)*10.);
+        int cellTmp = int((eta + 3.0)*10.)*60 + int((phi + 3.1)*10.);
 
         while(std::find(cell_filled.begin(), cell_filled.end(), cellTmp) != cell_filled.end()){
             if(rand->Integer(2) == 1){
@@ -94,7 +94,7 @@ void JetBranches::generateJets(TRandom3 *rand, int nCells, bool makeJetsCloseby)
             } else {
                 phi = double(TMath::Nint(rand->Gaus(jetPhi,0.2)*10.))*0.1;
             }
-            cellTmp = int((eta + 3.0)*10.)*int((phi + 3.1)*10.);
+            cellTmp = int((eta + 3.0)*10.)*60 + int((phi + 3.1)*10.);
         }
         
         if(energy > maxEnergyCell ){
@@ -160,7 +160,7 @@ void JetBranches::addIRNoise(int evt, TRandom3 *rand, JetBranches * &jetsIR, std
         double noiseEta = double(rand->Integer(61))*0.1 - 3.0;
         double noisePhi = double(rand->Integer(63))*0.1 - 3.1;
         double noiseEnergy = 0.00000001;
-        int cellTmp = int((noiseEta + 3.0)*10.)*int((noisePhi+ 3.1)*10.);
+        int cellTmp = int((noiseEta + 3.0)*10.)*60 + int((noisePhi + 3.1)*10.);
         if(std::find(cell_filled.begin(), cell_filled.end(), cellTmp) != cell_filled.end()){
             continue;
         }
