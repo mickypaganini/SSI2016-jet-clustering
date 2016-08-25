@@ -30,9 +30,10 @@ struct JetBranches
     double maxEnergyCell;
     void initializeVectors(TTree* &t);
     void clearAllVectors();
-    void generateJets(TRandom3* rand, int nCells);
-    void addIRNoise(TRandom3* rand,  JetBranches * &jetsIR);
+    void generateJets(TRandom3* rand, int nCells, bool makeJetsCloseby);
     void splitHighestECell(JetBranches * &jetsCL);
+    void addIRNoise(int evt, TRandom3 *rand, JetBranches * &jetsIR, std::ofstream &txtFileIR, std::ofstream &datFileIR);
+
 
 };
 #endif /* defined(__JetGenerator__JetBranches__) */
