@@ -1,0 +1,13 @@
+How to run the jet generator:
+
+1) compile (ROOTSYS environment variable needs to be set):
+g++ -o generateJets JetGenerator.cxx JetBranches.cxx `root-config --libs --cflags`
+
+2) run: need to add commands as listed below
+./generateJets [filename without extension] [nEvents] [nJetsPerEvent] [nClustersPerJet] [also make IR noise (on/off)] [make jets nearby (true/false)]
+
+e.g.
+./generateJets outFile 10 4 20 on false
+will make file, outFile.txt and outFile_withNoise.txt, each with 10 events. Each event will have 4 jets, and each jet will be made out of a mean of 20 clusters (exact number sampled from a gaussian with mean 20 and sigma 2 (configurable in JetGenerator.cxx).
+
+Output will also include a root file outFile.root, with a ttree jets and jetsWithIR, and a .dat file that is a list of E px py pz, formatted for spartyjet. 
