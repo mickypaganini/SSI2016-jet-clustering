@@ -1,6 +1,6 @@
 # SSI2016-jet-clustering
 ### - Improving jet clustering using different unsupervised learning algorithms - 
-Authors: Johan Bonilla([@AFJohan92](https://github.com/AFJohan92)), Chen-Hsun Chan ([@qwerasd9032](https://github.com/qwerasd9032)), Nicole Hartman ([@nhartman94](https://github.com/nhartman94)), Michela Paganini ([@mickypaganini](https://github.com/mickypaganini)), 
+Authors: Johan Bonilla([@AFJohan92](https://github.com/AFJohan92)), Jay Chan ([@qwerasd903](https://github.com/qwerasd903)), Nicole Hartman ([@nhartman94](https://github.com/nhartman94)), Michela Paganini ([@mickypaganini](https://github.com/mickypaganini)), 
 Juska Pekkanen ([@juska](https://github.com/juska)), Heather Russell ([@heatherrussell](https://github.com/heatherrussell)), David Sosa ([@davidsosa](https://github.com/davidsosa)), Savannah Thais ([@savvy379](https://github.com/savvy379)), Markus Zinser ([@mzinser-xse](https://github.com/mzinser-xse))
 
 
